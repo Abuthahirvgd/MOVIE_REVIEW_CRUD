@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieReviewSystem</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            background-image: url(poster.jpg) ;
+        }
+
+        /* Sticky header */
+        .top {
+            position: sticky;
+            top: 0;
+            background-color: rgba(246, 246, 3, 0.8);
+            padding: 1rem;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .top h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .top h5 {
+            margin: 0;
+            font-size: 1rem;
+            font-style: italic;
+        }
+
+        /* Content box */
+        .content-box {
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.8);
+            /* background-color: rgba(0, 0, 0, 0.5); */
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 90%;
+            margin-top: 50px;
+            /* color: #ffffff; */
+            z-index: 1;
+            text-align: center;
+            margin-left: 20%;
+        }
+
+        .content-box form {
+            margin-top: 1rem;
+        }
+
+        .content-box label {
+            display: block;
+            font-weight: bold;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .content-box input[type="text"],
+        .content-box textarea {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .button {
+            text-align: center;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            font-weight: bold;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        /* Edit and Delete buttons */
+        .edit-btn {
+            background-color: #33bfee;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            margin-right: 0.5rem;
+        }
+
+        .edit-btn:hover {
+            background-color: #007BFF;
+        }
+
+        .delete-btn {
+            background-color: #f14f4f;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .delete-btn:hover {
+            background-color: #FF0000;
+        }
+
+        
+
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            text-align: left;
+            z-index: 1001;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .cancel-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            padding: 0.4rem 0.8rem;
+            background-color: #eb7474;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .form-control{
+            width: 100%;
+            border-radius: 4px;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            width: 100%;
+        }
+
+        /* Review styling */
+        .review-item {
+            background-color: rgb(240, 247, 249);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            text-align: center;
+            align-items: center;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            float: right;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="top">
+        <h1>WATCH & REVIEW</h1>
+        <h5>"Discover and rate your favorite movies while sharing insights with fellow film enthusiasts!"</h5>
+    </div>
+
+    <!-- Content Box -->
+    <div class="content-box">
+        <form id="review-form">
+            <label for="name">Movie Name</label>
+            <input type="text" id="name" placeholder="Enter movie name" required>
+
+            <label for="url">Image URL</label>
+            <input type="text" id="url" placeholder="Enter image URL" required>
+
+            <label for="rate">Rate</label>
+            <input type="text" id="rate" placeholder="Enter the rate (1-5)" required>
+
+            <label for="review">Review</label>
+            <textarea id="review" placeholder="Enter your review" required></textarea>
+
+            <div class="button">
+                <button type="submit" class="btn" style="width: 100%;">Post Review</button>
+            </div>
+        </form>
+
+        <h2>All Reviews</h2>
+        <div id="all-reviews"></div>
+    </div>
+
+ <!-- Modal for editing review -->
+ <div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <form id="edit-form">
+            <h2 style="color: rgb(4, 130, 73);">Edit Review</h2>
+            <label for="edit-name">Movie Name</label><br>
+            <input type="text" id="edit-name" class="form-control" required><br><br>
+
+            <label for="edit-url">Image URL</label><br>
+            <input type="text" id="edit-url" class="form-control" required><br><br>
+
+            <label for="edit-rate">Rate</label><br>
+            <input type="text" id="edit-rate" class="form-control" required><br><br>
+
+            <label for="edit-review">Review</label><br>
+            <textarea id="edit-review" class="form-control" required></textarea><br><br>
+
+            <div class="button">
+                <button type="submit" class="btn">Update Review</button>
+                <!-- <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button> -->
+            </div>
+        </form>
+    </div>
+</div>
+
+    <script>
+        // Fetch and display reviews from localStorage
+        let reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+        const allReviewsContainer = document.getElementById('all-reviews');
+
+        document.getElementById('review-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+            createReview();
+        });
+
+        // Create a new review
+        function createReview() {
+            const name = document.getElementById('name').value;
+            const url = document.getElementById('url').value;
+            const rate = document.getElementById('rate').value;
+            const review = document.getElementById('review').value;
+
+            const newReview = { id: Date.now(), name, url, rate, review };
+            reviews.push(newReview);
+            saveReviews();
+            displayReviews();
+            document.getElementById('review-form').reset();
+        }
+
+        // Display all reviews
+        function displayReviews() {
+            allReviewsContainer.innerHTML = '';
+            reviews.forEach((review) => {
+                allReviewsContainer.innerHTML += `
+                    <div class="review-item">
+                        <h3>${review.name} (${review.rate}/5)</h3>
+                        <img src="${review.url}" alt="${review.name}" width="100">
+                        <p>${review.review}</p>
+                        <div class="buttons">
+                            <button class="edit-btn" onclick="editReview(${review.id})">Edit</button>
+                            <button class="delete-btn" onclick="deleteReview(${review.id})">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Save reviews to localStorage
+        function saveReviews() {
+            localStorage.setItem('reviews', JSON.stringify(reviews));
+        }
+
+        // Delete a review
+        function deleteReview(id) {
+            reviews = reviews.filter(review => review.id !== id);
+            saveReviews();
+            displayReviews();
+        }
+
+        // Open edit modal and populate with review data
+        function editReview(id) {
+            const review = reviews.find(r => r.id === id);
+            document.getElementById('edit-name').value = review.name;
+            document.getElementById('edit-url').value = review.url;
+            document.getElementById('edit-rate').value = review.rate;
+            document.getElementById('edit-review').value = review.review;
+            document.getElementById('editModal').style.display = 'flex';
+
+            // Submit edited review
+            document.getElementById('edit-form').onsubmit = function (e) {
+                e.preventDefault();
+                updateReview(id);
+            };
+        }
+
+        // Update review in the list
+        function updateReview(id) {
+            const updatedReview = {
+                id,
+                name: document.getElementById('edit-name').value,
+                url: document.getElementById('edit-url').value,
+                rate: document.getElementById('edit-rate').value,
+                review: document.getElementById('edit-review').value
+            };
+            reviews = reviews.map(r => (r.id === id ? updatedReview : r));
+            saveReviews();
+            displayReviews();
+            closeModal();
+        }
+
+        // Close the modal
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Initialize reviews
+        displayReviews();
+    </script>
+</body>
+
+</html>
